@@ -1,0 +1,39 @@
+{
+  "name": "@groupher/editor-emoji",
+  "version": "1.0.4",
+  "keywords": [
+    "codex editor",
+    "tool",
+    "code",
+    "editor.js",
+    "editorjs"
+  ],
+  "description": "emoji Tool for Editor.js",
+  "license": "MIT",
+  "repository": "https://github.com/groupher/editor-emoji",
+  "main": "./dist/bundle.js",
+  "scripts": {
+    "build": "webpack --mode production",
+    "build:dev": "webpack --mode development --watch"
+  },
+  "author": {
+    "name": "groupher team",
+    "email": "support@coderplanets.com"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.3.4",
+    "@babel/preset-env": "^7.3.4",
+    "babel-loader": "^8.0.5",
+    "css-loader": "^1.0.0",
+    "husky": "^4.2.5",
+    "prettier": "^2.0.5",
+    "pretty-quick": "^2.0.1",
+    "style-loader": "^0.21.0",
+    "webpack": "^4.29.5",
+    "webpack-cli": "^3.2.3"
+  },
+  "dependencies": {
+    "@groupher/editor-utils": "0.1.50",
+    "@groupher/eslint-config-web": "^2.0.9"
+  }
+}
