@@ -200,7 +200,9 @@ export default class Emoji {
    * Check and change Term's state for current selection
    */
   checkState(termTag) {
-    if (termTag && termTag.anchorNode.id === CSS.emoji) {
+    if (!termTag || termTag.anchorNode.id !== CSS.emoji) return
+
+    if (termTag.anchorNode.id === CSS.emoji) {
       return this.handleEmojiActions()
     }
 
