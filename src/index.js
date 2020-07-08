@@ -1,6 +1,13 @@
 import {
-  make, debounce, CSS, INLINE_BLOCK_TAG, moveCaretToEnd, keepCustomInlineToolOnly,
+  make,
+  debounce,
+  CSS,
+  INLINE_BLOCK_TAG,
+  moveCaretToEnd,
+  keepCustomInlineToolOnly,
   restoreDefaultInlineTools,
+  removeElementByClass,
+  convertElementToTextIfNeed,
 } from '@groupher/editor-utils'
 import './index.css'
 
@@ -58,8 +65,17 @@ export default class Emoji {
     this.suggestionContainer = make('div', [this.CSS.suggestionContainer], {})
 
     this.emojiInput = make('input', [this.CSS.emojiInput], {
-      innerHTML: '你想 @ 谁?',
+      innerHTML: 'emoji',
       autofocus: true,
+    })
+
+    this.emojiInput.addEventListener('focus', () => {
+      const emojiEl = document.querySelector('#' + this.CSS.emoji)
+
+      if (emojiEl) {
+        const emojiCursorHolder = make('span', CSS.focusHolder)
+        emojiEl.parentNode.insertBefore(emojiCursorHolder, emojiEl.nextSibling)
+      }
     })
 
     /**
@@ -72,9 +88,13 @@ export default class Emoji {
      * @return {void}
      */
     this.emojiInput.addEventListener('blur', () => {
-      if (this.emojiInput.value.trim() === '') {
-        // this.closeEmojiPopover()
-      }
+      setTimeout(() => {
+        const emojiEl = document.querySelector('#' + this.CSS.emoji)
+
+        if (this.emojiInput.value.trim() === '') {
+          this.cleanUp()
+        }
+      }, 300)
     })
 
     this.emojiContainer.appendChild(this.emojiInput)
@@ -82,7 +102,7 @@ export default class Emoji {
 
     this.emojiInput.addEventListener(
       'keyup',
-      debounce(this.handleEmojiInput.bind(this), 300),
+      debounce(this.handleInput.bind(this), 300),
     )
   }
 
@@ -91,9 +111,21 @@ export default class Emoji {
    *
    * @return {void}
    */
-  handleEmojiInput(ev) {
-    if (ev.code === 'Escape') return this.closeEmojiPopover()
-    if (ev.code === 'Enter') return console.log('select first item')
+  handleInput(ev) {
+    if (ev.code === 'Backspace' && this.emojiInput.value === '') {
+      this.cleanUp()
+      return
+    }
+    if (ev.code === 'Escape') {
+      // clear the mention input and close the toolbar
+      this.emojiInput.value = ''
+      this.cleanUp()
+      return
+    }
+
+    if (ev.code === 'Enter') {
+      return console.log('select first item')
+    }
 
     console.log('ev: ', ev.code)
 
@@ -179,6 +211,40 @@ export default class Emoji {
   }
 
   /**
+   * close the emoji popover, then focus to emoji holder
+   *
+   * @return {void}
+   */
+  cleanUp() {
+    const emojiEl = document.querySelector('#' + this.CSS.emoji)
+    if (!emojiEl) return
+
+    // empty the mention input
+    // this.mentionInput.value = ''
+    this.clearSuggestions()
+
+    // closePopover
+    const inlineToolBar = document.querySelector('.' + this.CSS.inlineToolBar)
+    // this.api.toolbar.close is not work
+    // so close the toolbar by remove the open class manually
+    // this.api.toolbar.close()
+    inlineToolBar.classList.remove(this.CSS.inlineToolBarOpen)
+
+    // move caret to end of the current emoji
+    if (emojiEl.nextElementSibling) {
+      moveCaretToEnd(emojiEl.nextElementSibling)
+    }
+
+    // emoji holder id should be uniq
+    // 在 moveCaret 定位以后才可以删除，否则定位会失败
+    setTimeout(() => {
+      this.removeAllHolderIds()
+      removeElementByClass(CSS.focusHolder)
+      convertElementToTextIfNeed(emojiEl, this.emojiInput, ':')
+    }, 50)
+  }
+
+  /**
    * Create button element for Toolbar
    * @ should not visible in toolbar, so return an empty div
    * @return {HTMLElement}
@@ -194,7 +260,7 @@ export default class Emoji {
    *
    * @param {Range} range - selected fragment
    */
-  surround(range) { }
+  surround(range) {}
 
   /**
    * Check and change Term's state for current selection

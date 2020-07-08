@@ -4,23 +4,19 @@
 
 .cdx-emoji {
   color: #1785a9;
-  font-weight: bold;
+  font-style: normal !important;
   outline: none;
-  margin-left: 4px;
-  margin-right: 4px;
 }
 .cdx-emoji::before {
-  content: ":";
+  content: ':';
   color: #1785a9;
   width: 12px;
   height: 12px;
-  margin-right: 2px;
   border-radius: 100%;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   font-size: 16px;
-  transform: rotateZ(-10deg);
   font-family: serif;
 }
 .cdx-emoji__container {
@@ -34,7 +30,7 @@
   padding: 5px;
   font-variant: tabular-nums;
   list-style: none;
-  font-feature-settings: "tnum";
+  font-feature-settings: 'tnum';
   position: relative;
   display: inline-block;
   width: 150px;
