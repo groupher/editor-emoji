@@ -672,6 +672,12 @@
     core-js-pure "^3.0.0"
     regenerator-runtime "^0.13.4"
 
+"@babel/runtime@7.5.5":
+  version "7.5.5"
+  resolved "https://registry.npm.taobao.org/@babel/runtime/download/@babel/runtime-7.5.5.tgz?cache=0&sync_timestamp=1593521118360&other_urls=https%3A%2F%2Fregistry.npm.taobao.org%2F%40babel%2Fruntime%2Fdownload%2F%40babel%2Fruntime-7.5.5.tgz#74fba56d35efbeca444091c7850ccd494fd2f132"
+  dependencies:
+    regenerator-runtime "^0.13.2"
+
 "@babel/runtime@^7.10.2", "@babel/runtime@^7.8.4":
   version "7.10.3"
   resolved "https://registry.npm.taobao.org/@babel/runtime/download/@babel/runtime-7.10.3.tgz?cache=0&sync_timestamp=1592627751139&other_urls=https%3A%2F%2Fregistry.npm.taobao.org%2F%40babel%2Fruntime%2Fdownload%2F%40babel%2Fruntime-7.10.3.tgz#670d002655a7c366540c67f6fd3342cd09500364"
@@ -731,6 +737,14 @@
     eslint-plugin-react "^7.13.0"
     eslint-plugin-react-hooks "^1.6.0"
     prettier "^1.18.2"
+
+"@jukben/emoji-search@^2.0.1":
+  version "2.0.1"
+  resolved "https://registry.npm.taobao.org/@jukben/emoji-search/download/@jukben/emoji-search-2.0.1.tgz#128ff80e3efaf00430cf1e235e5af81445f6f991"
+  dependencies:
+    "@babel/runtime" "7.5.5"
+    emojilib "2.4.0"
+    match-sorter "4.0.0"
 
 "@types/color-name@^1.1.1":
   version "1.1.1"
@@ -1722,6 +1736,10 @@ emoji-regex@^7.0.1:
 emoji-regex@^9.0.0:
   version "9.0.0"
   resolved "https://registry.npm.taobao.org/emoji-regex/download/emoji-regex-9.0.0.tgz#48a2309cc8a1d2e9d23bc6a67c39b63032e76ea4"
+
+emojilib@2.4.0:
+  version "2.4.0"
+  resolved "https://registry.npm.taobao.org/emojilib/download/emojilib-2.4.0.tgz#ac518a8bb0d5f76dda57289ccb2fdf9d39ae721e"
 
 emojis-list@^3.0.0:
   version "3.0.0"
@@ -2724,6 +2742,12 @@ map-visit@^1.0.0:
   dependencies:
     object-visit "^1.0.0"
 
+match-sorter@4.0.0:
+  version "4.0.0"
+  resolved "https://registry.npm.taobao.org/match-sorter/download/match-sorter-4.0.0.tgz#16f1a52ce51b01e462df3e8a9c16b8c1efac2584"
+  dependencies:
+    remove-accents "0.4.2"
+
 md5.js@^1.3.4:
   version "1.3.5"
   resolved "https://registry.npm.taobao.org/md5.js/download/md5.js-1.3.5.tgz#b5d07b8e3216e3e27cd728d72f70d1e6a342005f"
@@ -3441,7 +3465,7 @@ regenerate@^1.4.0:
   version "1.4.1"
   resolved "https://registry.npm.taobao.org/regenerate/download/regenerate-1.4.1.tgz#cad92ad8e6b591773485fbe05a485caf4f457e6f"
 
-regenerator-runtime@^0.13.4:
+regenerator-runtime@^0.13.2, regenerator-runtime@^0.13.4:
   version "0.13.5"
   resolved "https://registry.npm.taobao.org/regenerator-runtime/download/regenerator-runtime-0.13.5.tgz#d878a1d094b4306d10b9096484b33ebd55e26697"
 
@@ -3486,6 +3510,10 @@ regjsparser@^0.6.4:
   resolved "https://registry.npm.taobao.org/regjsparser/download/regjsparser-0.6.4.tgz#a769f8684308401a66e9b529d2436ff4d0666272"
   dependencies:
     jsesc "~0.5.0"
+
+remove-accents@0.4.2:
+  version "0.4.2"
+  resolved "https://registry.npm.taobao.org/remove-accents/download/remove-accents-0.4.2.tgz#0a43d3aaae1e80db919e07ae254b285d9e1c7bb5"
 
 remove-trailing-separator@^1.0.1:
   version "1.1.0"

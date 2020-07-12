@@ -1,3 +1,5 @@
+import emojiSearch from '@jukben/emoji-search'
+
 import {
   make,
   debounce,
@@ -45,7 +47,6 @@ export default class Emoji {
       emojiIntro: 'cdx-emoji-suggestion__intro',
       emojiAvatar: 'cdx-emoji-suggestion__avatar',
       emojiTitle: 'cdx-emoji-suggestion__title',
-      emojiDesc: 'cdx-emoji-suggestion__desc',
       suggestionContainer: 'cdx-emoji-suggestion-container',
       suggestion: 'cdx-emoji-suggestion',
       inlineToolBar: 'ce-inline-toolbar',
@@ -127,18 +128,26 @@ export default class Emoji {
       return console.log('select first item')
     }
 
-    console.log('ev: ', ev.code)
+    const emojiSearchResults = emojiSearch(ev.target.value).map((item) => {
+      return {
+        name: item.name,
+        char: item.char,
+        imgEl: twemoji.parse(item.char),
+      }
+    })
 
-    const user = {
-      id: 1,
-      title: 'mydaerxym',
-      desc: 'author of the ..',
-      avatar: 'https://avatars0.githubusercontent.com/u/6184465?s=40&v=4',
+    this.clearSuggestions()
+
+    for (let index = 0; index < emojiSearchResults.length; index++) {
+      const emoji = emojiSearchResults[index]
+
+      const suggestion = this.makeSuggestion({
+        title: emoji.name,
+        imgEl: emoji.imgEl,
+      })
+
+      this.suggestionContainer.appendChild(suggestion)
     }
-
-    const suggestion = this.makeSuggestion(user)
-
-    this.suggestionContainer.appendChild(suggestion)
   }
 
   /**
@@ -146,37 +155,32 @@ export default class Emoji {
    *
    * @return {HTMLElement}
    */
-  makeSuggestion(user) {
-    const emoji = document.querySelector('#' + this.CSS.emoji)
+  makeSuggestion(emoji) {
+    const emojiEl = document.querySelector('#' + this.CSS.emoji)
     const suggestionWrapper = make('div', [this.CSS.suggestion], {})
 
-    const avatar = make('img', [this.CSS.emojiAvatar], {
-      src: user.avatar,
+    const avatar = make('div', [this.CSS.emojiAvatar], {
+      innerHTML: emoji.imgEl,
     })
 
     const intro = make('div', [this.CSS.emojiIntro], {})
     const title = make('div', [this.CSS.emojiTitle], {
-      innerText: user.title,
-    })
-    const desc = make('div', [this.CSS.emojiDesc], {
-      innerText: user.desc,
+      innerText: emoji.title,
     })
 
     suggestionWrapper.appendChild(avatar)
     intro.appendChild(title)
-    intro.appendChild(desc)
     suggestionWrapper.appendChild(intro)
 
     suggestionWrapper.addEventListener('click', () => {
-      this.emojiInput.value = user.title
-      emoji.innerHTML = user.title
+      this.emojiInput.value = emoji.title
+      emojiEl.innerHTML = emoji.imgEl
       const emojiCursorHolder = make('span', CSS.focusHolder)
-      emoji.parentNode.insertBefore(emojiCursorHolder, emoji.nextSibling)
+      emojiEl.parentNode.insertBefore(emojiCursorHolder, emojiEl.nextSibling)
 
-      // console.log("--> emoji click before focus: ", emoji)
-      emoji.contenteditable = true
+      emojiEl.contenteditable = true
       this.closeEmojiPopover()
-      moveCaretToEnd(emoji.nextElementSibling)
+      moveCaretToEnd(emojiEl.nextElementSibling)
       // it worked !
       document.querySelector(`.${CSS.focusHolder}`).remove()
     })
