@@ -10,6 +10,7 @@ import {
   restoreDefaultInlineTools,
   removeElementByClass,
   convertElementToTextIfNeed,
+  insertHtmlAtCaret,
 } from '@groupher/editor-utils'
 import './index.css'
 
@@ -174,7 +175,10 @@ export default class Emoji {
 
     suggestionWrapper.addEventListener('click', () => {
       this.emojiInput.value = emoji.title
+      console.log('emojiEl: ', emojiEl)
       emojiEl.innerHTML = emoji.imgEl
+      emojiEl.classList.add('no-pseudo')
+
       const emojiCursorHolder = make('span', CSS.focusHolder)
       emojiEl.parentNode.insertBefore(emojiCursorHolder, emojiEl.nextSibling)
 
@@ -183,6 +187,7 @@ export default class Emoji {
       moveCaretToEnd(emojiEl.nextElementSibling)
       // it worked !
       document.querySelector(`.${CSS.focusHolder}`).remove()
+      insertHtmlAtCaret('&nbsp;')
     })
 
     // https://avatars0.githubusercontent.com/u/6184465?s=40&v=4
@@ -330,6 +335,9 @@ export default class Emoji {
     return {
       [INLINE_BLOCK_TAG.emoji]: {
         class: CSS.emoji,
+      },
+      img: {
+        class: 'emoji',
       },
     }
   }

@@ -20,6 +20,10 @@
   font-family: serif;
 }
 
+.cdx-emoji.no-pseudo::before {
+  content: none;
+}
+
 .cdx-emoji img {
   height: 1.1em;
   width: 1.1em;
