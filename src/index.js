@@ -1,4 +1,4 @@
-import emojiSearch from '@jukben/emoji-search'
+import emojiSearch from '@groupher/emoji-search'
 
 import {
   make,

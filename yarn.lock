@@ -722,6 +722,20 @@
     debug "^4.1.1"
     pubsub-js "^1.8.0"
 
+"@groupher/emoji-search@2.0.5":
+  version "2.0.5"
+  resolved "https://registry.yarnpkg.com/@groupher/emoji-search/-/emoji-search-2.0.5.tgz#fc59628cbd77d7874c03494d1fbe088ce1aad3a0"
+  integrity sha512-fuL55VNPSV28d/et+vfrwPI2f58THCSJ9wazoyrXHjxyS2Mk4hbEDd4fHMmPX60I+tBARmnaiK2kVpAjW/KXWQ==
+  dependencies:
+    "@babel/runtime" "7.5.5"
+    "@groupher/emojilib" "2.4.2"
+    match-sorter "4.0.0"
+
+"@groupher/emojilib@2.4.2":
+  version "2.4.2"
+  resolved "https://registry.yarnpkg.com/@groupher/emojilib/-/emojilib-2.4.2.tgz#5af686ae8569dc9527d11a4f1c33ca3cd887dd33"
+  integrity sha512-yjW+MCtXcgLLuHVmqJY97pje4cgkJgmnBe8nmJONrQC+56uIcTOPlT2joPeMJydgFPBzR31TLL70mJLr8o4bgw==
+
 "@groupher/eslint-config-web@^2.0.9":
   version "2.0.9"
   resolved "https://registry.npm.taobao.org/@groupher/eslint-config-web/download/@groupher/eslint-config-web-2.0.9.tgz#921040128d68de1184fac2a1db4def99f1b3deff"
@@ -738,14 +752,6 @@
     eslint-plugin-react "^7.13.0"
     eslint-plugin-react-hooks "^1.6.0"
     prettier "^1.18.2"
-
-"@jukben/emoji-search@^2.0.1":
-  version "2.0.1"
-  resolved "https://registry.npm.taobao.org/@jukben/emoji-search/download/@jukben/emoji-search-2.0.1.tgz#128ff80e3efaf00430cf1e235e5af81445f6f991"
-  dependencies:
-    "@babel/runtime" "7.5.5"
-    emojilib "2.4.0"
-    match-sorter "4.0.0"
 
 "@types/color-name@^1.1.1":
   version "1.1.1"
@@ -1737,10 +1743,6 @@ emoji-regex@^7.0.1:
 emoji-regex@^9.0.0:
   version "9.0.0"
   resolved "https://registry.npm.taobao.org/emoji-regex/download/emoji-regex-9.0.0.tgz#48a2309cc8a1d2e9d23bc6a67c39b63032e76ea4"
-
-emojilib@2.4.0:
-  version "2.4.0"
-  resolved "https://registry.npm.taobao.org/emojilib/download/emojilib-2.4.0.tgz#ac518a8bb0d5f76dda57289ccb2fdf9d39ae721e"
 
 emojis-list@^3.0.0:
   version "3.0.0"
