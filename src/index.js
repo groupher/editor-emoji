@@ -10,7 +10,7 @@ import {
   keepCustomInlineToolOnly,
   restoreDefaultInlineTools,
   removeElementByClass,
-  convertElementToTextIfNeed,
+  convertElementToText,
   insertHtmlAtCaret,
 } from '@groupher/editor-utils'
 import './index.css'
@@ -69,15 +69,13 @@ export default class Emoji {
       active: this.api.styles.inlineToolButtonActive,
     }
 
-    this.emojiContainer = make('div', [this.CSS.emojiContainer], {})
-    this.suggestionContainer = make('div', [this.CSS.suggestionContainer], {})
+    this.nodes = {
+      suggestionWrapper: make('div', this.CSS.suggestionContainer),
+      emojiInput: make('input', this.CSS.emojiInput),
+      emojiWrapper: make('div', this.CSS.emojiContainer),
+    }
 
-    this.emojiInput = make('input', [this.CSS.emojiInput], {
-      innerHTML: 'emoji',
-      autofocus: true,
-    })
-
-    this.emojiInput.addEventListener('focus', () => {
+    this.nodes.emojiInput.addEventListener('focus', () => {
       const emojiEl = document.querySelector('#' + this.CSS.emoji)
 
       if (emojiEl) {
@@ -86,31 +84,12 @@ export default class Emoji {
       }
     })
 
-    /**
-     * should clear anchors after user manually click outside the popover,
-     * otherwise will confuse the next insert
-     *
-     * 用户手动点击其他位置造成失焦以后，如果没有输入的话需要清理 anchors，
-     * 否则会造成下次插入 emoji 的时候定位异常
-     *
-     * @return {void}
-     */
-    this.emojiInput.addEventListener('blur', () => {
-      setTimeout(() => {
-        const emojiEl = document.querySelector('#' + this.CSS.emoji)
+    this.nodes.emojiWrapper.appendChild(this.nodes.emojiInput)
+    this.nodes.emojiWrapper.appendChild(this.nodes.suggestionWrapper)
 
-        if (this.emojiInput.value.trim() === '') {
-          this.cleanUp()
-        }
-      }, 300)
-    })
-
-    this.emojiContainer.appendChild(this.emojiInput)
-    this.emojiContainer.appendChild(this.suggestionContainer)
-
-    this.emojiInput.addEventListener(
+    this.nodes.emojiInput.addEventListener(
       'keyup',
-      debounce(this.handleInput.bind(this), 300),
+      debounce(this._handleInput.bind(this), 300),
     )
   }
 
@@ -119,41 +98,36 @@ export default class Emoji {
    *
    * @return {void}
    */
-  handleInput(ev) {
-    if (ev.code === 'Backspace' && this.emojiInput.value === '') {
-      this.cleanUp()
-      return
-    }
-    if (ev.code === 'Escape') {
-      // clear the mention input and close the toolbar
-      this.emojiInput.value = ''
-      this.cleanUp()
-      return
-    }
+  _handleInput(e) {
+    if (e.code === 'Escape') return this._hideMentionPanel()
 
-    if (ev.code === 'Enter') {
+    if (e.code === 'Enter') {
       return console.log('select first item')
     }
 
-    const emojiSearchResults = emojiSearch(ev.target.value).map((item) => {
+    const emptyContainer = make('div', this.CSS.suggestionContainer)
+    this.nodes.suggestionWrapper.replaceWith(emptyContainer)
+    this.nodes.suggestionWrapper = emptyContainer
+
+    const emojiSearchResults = emojiSearch(e.target.value).map((item) => {
+      const imgEl = twemoji.parse(item.char)
+
       return {
         name: item.name,
         char: item.char,
-        imgEl: twemoji.parse(item.char),
+        imgEl: imgEl,
       }
     })
-
-    this.clearSuggestions()
 
     for (let index = 0; index < emojiSearchResults.length; index++) {
       const emoji = emojiSearchResults[index]
 
-      const suggestion = this.makeSuggestion({
+      const suggestion = this._drawSuggestion({
         title: emoji.name,
         imgEl: emoji.imgEl,
       })
 
-      this.suggestionContainer.appendChild(suggestion)
+      this.nodes.suggestionWrapper.appendChild(suggestion)
     }
   }
 
@@ -162,42 +136,45 @@ export default class Emoji {
    *
    * @return {HTMLElement}
    */
-  makeSuggestion(emoji) {
-    const emojiEl = document.querySelector('#' + this.CSS.emoji)
-    const suggestionWrapper = make('div', [this.CSS.suggestion], {})
+  _drawSuggestion(emoji) {
+    const WrapperEl = make('div', this.CSS.suggestion)
+    const EmojiEl = document.querySelector('#' + this.CSS.emoji)
 
-    const avatar = make('div', [this.CSS.emojiAvatar], {
+    const AvatarEl = make('div', this.CSS.emojiAvatar, {
       innerHTML: emoji.imgEl,
     })
 
-    const intro = make('div', [this.CSS.emojiIntro], {})
-    const title = make('div', [this.CSS.emojiTitle], {
+    const IntroEl = make('div', this.CSS.emojiIntro)
+    const TitleEl = make('div', [this.CSS.emojiTitle], {
       innerText: emoji.title,
     })
 
-    suggestionWrapper.appendChild(avatar)
-    intro.appendChild(title)
-    suggestionWrapper.appendChild(intro)
+    WrapperEl.appendChild(AvatarEl)
+    IntroEl.appendChild(TitleEl)
+    WrapperEl.appendChild(IntroEl)
 
-    suggestionWrapper.addEventListener('click', () => {
-      this.emojiInput.value = emoji.title
-      emojiEl.innerHTML = emoji.imgEl
-      emojiEl.classList.add('no-pseudo')
+    WrapperEl.addEventListener('click', () => {
+      this.nodes.emojiInput.value = emoji.title
+      EmojiEl.innerHTML = emoji.imgEl
+      EmojiEl.classList.add('no-pseudo')
 
-      const emojiCursorHolder = make('span', CSS.focusHolder)
-      emojiEl.parentNode.insertBefore(emojiCursorHolder, emojiEl.nextSibling)
+      const EmojiParentEl = EmojiEl.parentNode
 
-      emojiEl.contenteditable = true
+      // 防止重复插入 holder, 否则会导致多次聚焦后光标错位
+      if (!EmojiParentEl.querySelector(`.${CSS.focusHolder}`)) {
+        const MentionCursorHolder = make('span', CSS.focusHolder)
+        EmojiParentEl.insertBefore(EmojiCursorHolder, EmojiEl.nextSibling)
+      }
+
+      EmojiEl.contenteditable = true
       this.closeEmojiPopover()
-      moveCaretToEnd(emojiEl.nextElementSibling)
+      moveCaretToEnd(EmojiEl.nextElementSibling)
       // it worked !
       document.querySelector(`.${CSS.focusHolder}`).remove()
       insertHtmlAtCaret('&nbsp;')
     })
 
-    // https://avatars0.githubusercontent.com/u/6184465?s=40&v=4
-
-    return suggestionWrapper
+    return WrapperEl
   }
 
   /**
@@ -206,12 +183,11 @@ export default class Emoji {
    * @return {void}
    */
   closeEmojiPopover() {
-    this.clearSuggestions()
+    this._clearSuggestions()
     const emoji = document.querySelector('#' + this.CSS.emoji)
     const inlineToolBar = document.querySelector('.' + this.CSS.inlineToolBar)
 
-    // empty the emoji input
-    this.emojiInput.value = ''
+    this._clearInput()
 
     // this.api.toolbar.close is not work
     // so close the toolbar by remove the optn class mannully
@@ -229,13 +205,13 @@ export default class Emoji {
    *
    * @return {void}
    */
-  cleanUp() {
+  _hideMentionPanel() {
     const emojiEl = document.querySelector('#' + this.CSS.emoji)
     if (!emojiEl) return
 
     // empty the mention input
-    // this.mentionInput.value = ''
-    this.clearSuggestions()
+    this._clearInput()
+    this._clearSuggestions()
 
     // closePopover
     const inlineToolBar = document.querySelector('.' + this.CSS.inlineToolBar)
@@ -254,8 +230,11 @@ export default class Emoji {
     setTimeout(() => {
       this.removeAllHolderIds()
       removeElementByClass(CSS.focusHolder)
-      convertElementToTextIfNeed(emojiEl, this.emojiInput, ':')
-    }, 50)
+
+      if (emojiEl.innerHTML === '&nbsp;') {
+        convertElementToText(emojiEl, true, ':')
+      }
+    })
   }
 
   /**
@@ -264,7 +243,7 @@ export default class Emoji {
    * @return {HTMLElement}
    */
   render() {
-    const emptyDiv = make('div', [this.CSS.emojiToolbarBlock], {})
+    const emptyDiv = make('div', this.CSS.emojiToolbarBlock)
 
     return emptyDiv
   }
@@ -290,7 +269,7 @@ export default class Emoji {
     if (!termTag || termTag.anchorNode.id !== CSS.emoji) return // restoreDefaultInlineTools()
 
     if (termTag.anchorNode.id === CSS.emoji) {
-      return this.handleEmojiActions()
+      return this._handleEmojiActions()
     }
 
     // normal inline tools
@@ -301,26 +280,34 @@ export default class Emoji {
    * show emoji suggestions, hide normal actions like bold, italic etc...inline-toolbar buttons
    * 隐藏正常的 粗体，斜体等等 inline-toolbar 按钮，这里是借用了自带 popover 的一个 hack
    */
-  handleEmojiActions() {
-    keepCustomInlineToolOnly('emoji')
-
-    this.clearSuggestions()
-    // this.removeAllHolderIds();
-    this.emojiInput.value = ''
+  _handleEmojiActions() {
+    // NOTE: the custom tool only visible on next tick
+    setTimeout(() => keepCustomInlineToolOnly('emoji'))
 
     setTimeout(() => {
-      this.emojiInput.focus()
+      this.nodes.emojiInput.focus()
     }, 100)
   }
 
-  // clear suggestions list
-  clearSuggestions() {
+  /**
+   * clear suggestions list
+   * @memberof Emoji
+   */
+  _clearSuggestions() {
     const node = document.querySelector('.' + this.CSS.suggestionContainer)
     if (node) {
       while (node.firstChild) {
         node.removeChild(node.firstChild)
       }
     }
+  }
+
+  /**
+   * clear current input
+   * @memberof Emoji
+   */
+  _clearInput() {
+    this.nodes.emojiInput.value = ''
   }
 
   // 删除所有 emoji-holder 的 id， 因为 closeEmojiPopover 无法处理失焦后
@@ -334,9 +321,9 @@ export default class Emoji {
   }
 
   renderActions() {
-    this.emojiInput.placeholder = 'Emoji Code'
+    this.nodes.emojiInput.placeholder = '搜索 Emoji'
 
-    return this.emojiContainer
+    return this.nodes.emojiWrapper
   }
 
   /**
@@ -352,5 +339,22 @@ export default class Emoji {
         class: 'emoji',
       },
     }
+  }
+
+  /**
+   * hide mention panel after popover closed
+   * @see @link https://editorjs.io/inline-tools-api-1#clear
+   * @memberof Mention
+   */
+  clear() {
+    /**
+     * should clear anchors after user manually click outside the popover,
+     * otherwise will confuse the next insert
+     *
+     * 用户手动点击其他位置造成失焦以后，如果没有输入的话需要清理 anchors，
+     * 否则会造成下次插入 emoji 的时候定位异常
+     *
+     */
+    setTimeout(() => this._hideMentionPanel())
   }
 }

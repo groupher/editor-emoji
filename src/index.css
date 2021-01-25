@@ -36,7 +36,6 @@
 }
 
 .cdx-emoji__input {
-  margin-bottom: 8px;
   outline: none;
   box-sizing: border-box;
   padding: 5px;
@@ -44,7 +43,7 @@
   list-style: none;
   font-feature-settings: 'tnum';
   position: relative;
-  width: 180px;
+  width: 140px;
   height: 26px;
   color: rgba(0, 0, 0, 0.65);
   font-size: 13px;
@@ -61,11 +60,11 @@
 }
 
 .cdx-emoji-suggestion-container {
-  width: 100%;
+  width: 140px;
   min-height: 1px;
   max-height: 300px;
   overflow: hidden;
-  margin-top: 5px;
+  margin-top: 3px;
 }
 
 .cdx-emoji-suggestion {
@@ -101,4 +100,9 @@
 
 .cdx-emoji-suggestion__title {
   color: #828282;
+  font-size: 12px;
+  width: 100px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
