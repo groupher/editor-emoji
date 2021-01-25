@@ -1,3 +1,4 @@
+import twemoji from 'twemoji'
 import emojiSearch from '@groupher/emoji-search'
 
 import {
@@ -11,10 +12,8 @@ import {
   removeElementByClass,
   convertElementToTextIfNeed,
   insertHtmlAtCaret,
-  importScript,
 } from '@groupher/editor-utils'
 import './index.css'
-
 
 /**
  * Emoji Tool for the Editor.js
@@ -113,12 +112,6 @@ export default class Emoji {
       'keyup',
       debounce(this.handleInput.bind(this), 300),
     )
-
-    importScript('https://twemoji.maxcdn.com/v/latest/twemoji.min.js', ['twemoji']).then(([twemoji]) => {
-      console.log("## load twemoji")
-    }).catch(e => {
-      console.log("e: ", e)
-    })
   }
 
   /**
@@ -146,7 +139,6 @@ export default class Emoji {
       return {
         name: item.name,
         char: item.char,
-        // TODO:  judge if twemoji is init
         imgEl: twemoji.parse(item.char),
       }
     })
@@ -189,7 +181,6 @@ export default class Emoji {
 
     suggestionWrapper.addEventListener('click', () => {
       this.emojiInput.value = emoji.title
-      console.log('emojiEl: ', emojiEl)
       emojiEl.innerHTML = emoji.imgEl
       emojiEl.classList.add('no-pseudo')
 
@@ -283,18 +274,18 @@ export default class Emoji {
    *
    * @param {Range} range - selected fragment
    */
-  surround(range) { }
+  surround(range) {}
 
   /**
    * Check and change Term's state for current selection
    */
   checkState(termTag) {
     // NOTE: if emoji is init after mention, then the restoreDefaultInlineTools should be called
-    // otherwise restoreDefaultInlineTools should not be called, because the mention plugin 
+    // otherwise restoreDefaultInlineTools should not be called, because the mention plugin
     // called first
-    // 
+    //
     // restoreDefaultInlineTools 是否调用和 mention / emoji 的初始化循序有关系，
-    // 如果 mention 在 emoji 之前初始化了，那么 emoji 这里就不需要调用 restoreDefaultInlineTools, 
+    // 如果 mention 在 emoji 之前初始化了，那么 emoji 这里就不需要调用 restoreDefaultInlineTools,
     // 否则会导致 mention  无法正常显示。反之亦然。
     if (!termTag || termTag.anchorNode.id !== CSS.emoji) return // restoreDefaultInlineTools()
 
