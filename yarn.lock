@@ -721,17 +721,17 @@
     debug "^4.1.1"
     pubsub-js "^1.8.0"
 
-"@groupher/emoji-search@2.0.5":
-  version "2.0.5"
-  resolved "https://registry.yarnpkg.com/@groupher/emoji-search/-/emoji-search-2.0.5.tgz#fc59628cbd77d7874c03494d1fbe088ce1aad3a0"
+"@groupher/emoji-search@2.0.6":
+  version "2.0.6"
+  resolved "https://registry.npm.taobao.org/@groupher/emoji-search/download/@groupher/emoji-search-2.0.6.tgz#1ff355da9ce258e31e8220644895e15e5476de41"
   dependencies:
     "@babel/runtime" "7.5.5"
-    "@groupher/emojilib" "2.4.2"
+    "@groupher/emojilib" "2.4.31"
     match-sorter "4.0.0"
 
-"@groupher/emojilib@2.4.2":
-  version "2.4.2"
-  resolved "https://registry.yarnpkg.com/@groupher/emojilib/-/emojilib-2.4.2.tgz#5af686ae8569dc9527d11a4f1c33ca3cd887dd33"
+"@groupher/emojilib@2.4.31":
+  version "2.4.31"
+  resolved "https://registry.npm.taobao.org/@groupher/emojilib/download/@groupher/emojilib-2.4.31.tgz#62152d4d7db52a7bc4cf1f262396f4f74490bec4"
 
 "@groupher/eslint-config-web@^2.0.9":
   version "2.0.9"

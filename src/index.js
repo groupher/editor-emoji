@@ -13,7 +13,16 @@ import {
   convertElementToText,
   insertHtmlAtCaret,
 } from '@groupher/editor-utils'
+
 import './index.css'
+import { COMMON_EMOJIS } from './constant'
+
+/**
+ * @typedef {Object} EmojiItem
+ * @description emoji item data for twitter emoji
+ * @property {String} title - emoji title
+ * @property {String} imgEl — emoji image HTMLElement string
+ */
 
 /**
  * Emoji Tool for the Editor.js
@@ -35,10 +44,6 @@ export default class Emoji {
    */
   constructor({ api }) {
     this.api = api
-    // this.api.notifier.show({
-    //   message: 'hello world',
-    //   style: 'error'
-    // })
 
     /**
      * Tag represented the term
@@ -54,7 +59,9 @@ export default class Emoji {
       emojiIntro: 'cdx-emoji-suggestion__intro',
       emojiAvatar: 'cdx-emoji-suggestion__avatar',
       emojiTitle: 'cdx-emoji-suggestion__title',
-      suggestionContainer: 'cdx-emoji-suggestion-container',
+      suggestionsWrapper: 'cdx-emoji-suggestions-wrapper',
+      simpleSuggestionsWrapper: 'cdx-emoji-simple-suggestions-wrapper',
+      simpleSuggestion: 'cdx-emoji-simple-suggestion',
       suggestion: 'cdx-emoji-suggestion',
       inlineToolBar: 'ce-inline-toolbar',
       inlineToolBarOpen: 'ce-inline-toolbar--showed',
@@ -70,9 +77,11 @@ export default class Emoji {
     }
 
     this.nodes = {
-      suggestionWrapper: make('div', this.CSS.suggestionContainer),
-      emojiInput: make('input', this.CSS.emojiInput),
       emojiWrapper: make('div', this.CSS.emojiContainer),
+      suggestionsWrapper: make('div', this.CSS.suggestionsWrapper),
+      // include latest-used && common-suggestions
+      simpleSuggestionsWrapper: make('div', this.CSS.simpleSuggestionsWrapper),
+      emojiInput: make('input', this.CSS.emojiInput),
     }
 
     this.nodes.emojiInput.addEventListener('focus', () => {
@@ -84,12 +93,26 @@ export default class Emoji {
       }
     })
 
+    // TODO: cache it
+    COMMON_EMOJIS.forEach((emoji) => {
+      const EmojiEl = make('div', this.CSS.simpleSuggestion, {
+        innerHTML: emoji.imgEl,
+      })
+      this.api.tooltip.onHover(EmojiEl, emoji.title, {
+        delay: 400,
+        placement: 'top',
+      })
+      this._bindSuggestionClick(EmojiEl, emoji)
+      this.nodes.simpleSuggestionsWrapper.appendChild(EmojiEl)
+    })
+
+    this.nodes.emojiWrapper.appendChild(this.nodes.simpleSuggestionsWrapper)
     this.nodes.emojiWrapper.appendChild(this.nodes.emojiInput)
-    this.nodes.emojiWrapper.appendChild(this.nodes.suggestionWrapper)
+    this.nodes.emojiWrapper.appendChild(this.nodes.suggestionsWrapper)
 
     this.nodes.emojiInput.addEventListener(
       'keyup',
-      debounce(this._handleInput.bind(this), 300),
+      debounce(this._handleInput.bind(this), 100),
     )
   }
 
@@ -104,41 +127,45 @@ export default class Emoji {
     if (e.code === 'Enter') {
       return console.log('select first item')
     }
+    const inputVal = e.target.value
 
-    const emptyContainer = make('div', this.CSS.suggestionContainer)
-    this.nodes.suggestionWrapper.replaceWith(emptyContainer)
-    this.nodes.suggestionWrapper = emptyContainer
+    if (inputVal.trim() !== '') {
+      this.nodes.simpleSuggestionsWrapper.style.display = 'none'
+      this.nodes.suggestionsWrapper.style.display = 'block'
+    } else {
+      setTimeout(() => {
+        this.nodes.simpleSuggestionsWrapper.style.display = 'flex'
+        this.nodes.suggestionsWrapper.style.display = 'none'
+      })
+    }
 
-    const emojiSearchResults = emojiSearch(e.target.value).map((item) => {
-      const imgEl = twemoji.parse(item.char)
+    // empty the existed suggestion if need
+    const emptyContainer = make('div', this.CSS.suggestionsWrapper)
+    this.nodes.suggestionsWrapper.replaceWith(emptyContainer)
+    this.nodes.suggestionsWrapper = emptyContainer
 
+    const emojiSearchResults = emojiSearch(inputVal).map((item) => {
       return {
-        name: item.name,
-        char: item.char,
-        imgEl: imgEl,
+        title: item.name,
+        imgEl: twemoji.parse(item.char),
       }
     })
 
     for (let index = 0; index < emojiSearchResults.length; index++) {
-      const emoji = emojiSearchResults[index]
+      const { title, imgEl } = emojiSearchResults[index]
 
-      const suggestion = this._drawSuggestion({
-        title: emoji.name,
-        imgEl: emoji.imgEl,
-      })
-
-      this.nodes.suggestionWrapper.appendChild(suggestion)
+      const suggestion = this._drawSuggestion({ title, imgEl })
+      this.nodes.suggestionsWrapper.appendChild(suggestion)
     }
   }
 
   /**
    * generate suggestion block
-   *
+   * @param {EmojiItem} emoji
    * @return {HTMLElement}
    */
   _drawSuggestion(emoji) {
     const WrapperEl = make('div', this.CSS.suggestion)
-    const EmojiEl = document.querySelector('#' + this.CSS.emoji)
 
     const AvatarEl = make('div', this.CSS.emojiAvatar, {
       innerHTML: emoji.imgEl,
@@ -153,8 +180,24 @@ export default class Emoji {
     IntroEl.appendChild(TitleEl)
     WrapperEl.appendChild(IntroEl)
 
-    WrapperEl.addEventListener('click', () => {
+    this._bindSuggestionClick(WrapperEl, emoji)
+
+    return WrapperEl
+  }
+
+  /**
+   * handle suggestion click
+   *
+   * @param {HTMLElement} el
+   * @param {EmojiItem} emoji
+   * @memberof Emoji
+   */
+  _bindSuggestionClick(el, emoji) {
+    el.addEventListener('click', () => {
       this.nodes.emojiInput.value = emoji.title
+      const EmojiEl = document.querySelector('#' + this.CSS.emoji)
+      if (!EmojiEl) return false
+
       EmojiEl.innerHTML = emoji.imgEl
       EmojiEl.classList.add('no-pseudo')
 
@@ -162,7 +205,7 @@ export default class Emoji {
 
       // 防止重复插入 holder, 否则会导致多次聚焦后光标错位
       if (!EmojiParentEl.querySelector(`.${CSS.focusHolder}`)) {
-        const MentionCursorHolder = make('span', CSS.focusHolder)
+        const EmojiCursorHolder = make('span', CSS.focusHolder)
         EmojiParentEl.insertBefore(EmojiCursorHolder, EmojiEl.nextSibling)
       }
 
@@ -173,8 +216,6 @@ export default class Emoji {
       document.querySelector(`.${CSS.focusHolder}`).remove()
       insertHtmlAtCaret('&nbsp;')
     })
-
-    return WrapperEl
   }
 
   /**
@@ -294,7 +335,7 @@ export default class Emoji {
    * @memberof Emoji
    */
   _clearSuggestions() {
-    const node = document.querySelector('.' + this.CSS.suggestionContainer)
+    const node = document.querySelector('.' + this.CSS.suggestionsWrapper)
     if (node) {
       while (node.firstChild) {
         node.removeChild(node.firstChild)
@@ -321,7 +362,7 @@ export default class Emoji {
   }
 
   renderActions() {
-    this.nodes.emojiInput.placeholder = '搜索 Emoji'
+    this.nodes.emojiInput.placeholder = '搜索表情'
 
     return this.nodes.emojiWrapper
   }
