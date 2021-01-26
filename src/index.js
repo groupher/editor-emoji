@@ -307,7 +307,8 @@ export default class Emoji {
     // restoreDefaultInlineTools 是否调用和 mention / emoji 的初始化循序有关系，
     // 如果 mention 在 emoji 之前初始化了，那么 emoji 这里就不需要调用 restoreDefaultInlineTools,
     // 否则会导致 mention  无法正常显示。反之亦然。
-    if (!termTag || termTag.anchorNode.id !== CSS.emoji) return // restoreDefaultInlineTools()
+    if (!termTag || termTag.anchorNode.id !== CSS.emoji)
+      return restoreDefaultInlineTools()
 
     if (termTag.anchorNode.id === CSS.emoji) {
       return this._handleEmojiActions()

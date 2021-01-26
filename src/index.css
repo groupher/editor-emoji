@@ -6,6 +6,7 @@
   color: #1785a9;
   font-style: normal !important;
   outline: none;
+  margin: 0 4px;
 }
 .cdx-emoji::before {
   content: ':';
@@ -27,7 +28,6 @@
 .cdx-emoji img {
   height: 1.1em;
   width: 1.1em;
-  margin: 0 0.05em 0 0.1em;
   vertical-align: -0.1em;
 }
 
