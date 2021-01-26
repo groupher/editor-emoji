@@ -1,6 +1,6 @@
 {
   "name": "@groupher/editor-emoji",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "keywords": [
     "codex editor",
     "tool",
@@ -33,7 +33,7 @@
     "webpack-cli": "^3.2.3"
   },
   "dependencies": {
-    "@groupher/editor-utils": "0.2.12",
+    "@groupher/editor-utils": "0.2.16",
     "@groupher/emoji-search": "2.0.6",
     "@groupher/eslint-config-web": "^2.0.9",
     "twemoji": "^13.0.1"
