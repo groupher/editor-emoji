@@ -106,8 +106,8 @@ export default class Emoji {
       this.nodes.simpleSuggestionsWrapper.appendChild(EmojiEl)
     })
 
-    this.nodes.emojiWrapper.appendChild(this.nodes.simpleSuggestionsWrapper)
     this.nodes.emojiWrapper.appendChild(this.nodes.emojiInput)
+    this.nodes.emojiWrapper.appendChild(this.nodes.simpleSuggestionsWrapper)
     this.nodes.emojiWrapper.appendChild(this.nodes.suggestionsWrapper)
 
     this.nodes.emojiInput.addEventListener(
